@@ -1,12 +1,16 @@
 import cv2
 import time
+from backend import send_email
 
 video = cv2.VideoCapture(1)
 time.sleep(1)
 
 first_frame = None
+status_list = []
 
 while True:
+    # if no object status is 0
+    status = 0
     check, frame = video.read()
     # convert the frame to a grayscale image to reduce data size
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -35,7 +39,25 @@ while True:
         if cv2.contourArea(contour) < 5530:
             continue
         x, y, w, h = cv2.boundingRect(contour)
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)
+        rectangle = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)
+
+        # the section that will send email if we notice a rectangle
+        if rectangle.any():
+            # for when there is a object in view
+            status = 1
+
+
+    status_list.append(status)
+    # showing the last two items in the list
+    # looking for change or no change
+    status_list = status_list[-2:]
+
+    # object lef the frame in to send the email
+    if status_list[0] == 1 and status_list[1] == 0:
+        send_email()
+
+    print(status_list)
+
 
     cv2.imshow("video", frame)
 
