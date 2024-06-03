@@ -7,6 +7,7 @@ SENDER = config.gmail_user
 PASSWORD = config.app_pass
 RECEIVER = config.gmail_user
 def send_email(img_path):
+    print("send_email function has started")
     email_message = EmailMessage()
     # acts like a dict
     # Subject
@@ -28,7 +29,7 @@ def send_email(img_path):
     gmail.login(SENDER, PASSWORD)
     gmail.sendmail(SENDER, RECEIVER, email_message.as_string())
     gmail.quit()
-
+    print("send_email function has ended")
 
 if __name__ == "__main__":
     send_email(img_path="img/image40.png")

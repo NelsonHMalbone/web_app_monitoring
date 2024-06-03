@@ -1,6 +1,6 @@
 import glob
 import os
-
+from threading import Thread
 import cv2
 import time
 from backend import send_email
@@ -13,9 +13,12 @@ status_list = []
 count = 1
 
 def clean_folder():
+    print("clean_folder function was started")
     imgs = glob.glob("img/*.png")
     for image in imgs:
         os.remove(image)
+    print("clean_folder function has ended")
+
 
 while True:
     # if no object status is 0
@@ -71,8 +74,19 @@ while True:
 
     # object lef the frame in to send the email
     if status_list[0] == 1 and status_list[1] == 0:
-        send_email(img_with_obj)
-        clean_folder()
+        # email thread prepare
+        email_thread = Thread(target=send_email,
+                              args=(img_with_obj, ))
+        # adding a "," will make it a tupil
+        email_thread.daemon = True
+        # clean thread prepare
+        clean_thread = Thread(target=clean_folder)
+        clean_thread.daemon = True
+
+        # calling threads
+        email_thread.start()
+
+
 
     cv2.imshow("video", frame)
 
@@ -81,3 +95,6 @@ while True:
         break
 
 video.release()
+
+clean_thread.start()
+time.sleep(1)
