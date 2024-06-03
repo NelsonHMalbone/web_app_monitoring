@@ -1,3 +1,5 @@
+import glob
+
 import cv2
 import time
 from backend import send_email
@@ -7,11 +9,12 @@ time.sleep(1)
 
 first_frame = None
 status_list = []
-
+count = 1
 while True:
     # if no object status is 0
     status = 0
     check, frame = video.read()
+
     # convert the frame to a grayscale image to reduce data size
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -45,7 +48,14 @@ while True:
         if rectangle.any():
             # for when there is a object in view
             status = 1
-
+            # saving a img
+            # cv2.imwrite("image.png", frame) # static no go for this operation
+            # dynamtic so it will add a number instead of saving over the same file name
+            cv2.imwrite(f"img/image{count}.png", frame)
+            count = count + 1
+            all_imgs = glob.glob("img/*.png")
+            index = int(len(all_imgs) / 2)
+            img_with_obj = all_imgs[index]
 
     status_list.append(status)
     # showing the last two items in the list
